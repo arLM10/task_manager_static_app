@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Demo - Task Manager</title>
+    <link rel="stylesheet" href="task-styles.css">
+    <style>
+        .demo-section {
+            background: #f9f9f9;
+            border: 2px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .storage-content {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .demo-button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .demo-button:hover {
+            background: #218838;
+        }
+
+        .clear-button {
+            background: #dc3545;
+        }
+
+        .clear-button:hover {
+            background: #c82333;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-empty {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .task-list-demo {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list-demo li {
+            background: #f0f0f0;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .task-list-demo .completed {
+            text-decoration: line-through;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Storage Demo</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            Understand how localStorage and sessionStorage work
+        </p>
+
+        <!-- Navigation Back -->
+        <div class="navigation">
+            <a href="index.html" class="nav-link">← Back to Task Manager</a>
+        </div>
+
+        <!-- Session Storage Section -->
+        <div class="demo-section">
+            <h2>⏱️ sessionStorage (Current Session Only)</h2>
+            <p>Data exists only for this browser tab/window. Closes when you close this tab.</p>
+
+            <button class="demo-button" onclick="viewSessionStorage()">View sessionStorage</button>
+            <button class="demo-button clear-button" onclick="clearSessionStorage()">Clear sessionStorage</button>
+
+            <div id="sessionContent" class="storage-content"></div>
+        </div>
+
+        <!-- Local Storage Section -->
+        <div class="demo-section">
+            <h2>📦 localStorage (Persistent)</h2>
+            <p>Data persists across browser sessions until manually cleared.</p>
+
+            <button class="demo-button" onclick="viewLocalStorage()">View localStorage</button>
+            <button class="demo-button clear-button" onclick="clearLocalStorage()">Clear localStorage</button>
+
+            <div id="localContent" class="storage-content"></div>
+        </div>
+
+        <!-- Comparison Section -->
+        <div class="demo-section">
+            <h2>📊 Storage Comparison</h2>
+            <table class="comparison-table">
+                <tr>
+                    <th>Feature</th>
+                    <th>localStorage</th>
+                    <th>sessionStorage</th>
+                </tr>
+                <tr>
+                    <td><strong>Persistence</strong></td>
+                    <td>Permanent (until cleared)</td>
+                    <td>Until tab closes</td>
+                </tr>
+                <tr>
+                    <td><strong>Scope</strong></td>
+                    <td>All tabs of same domain</td>
+                    <td>Single tab only</td>
+                </tr>
+                <tr>
+                    <td><strong>Size Limit</strong></td>
+                    <td>5-10 MB per domain</td>
+                    <td>5-10 MB per domain</td>
+                </tr>
+                <tr>
+                    <td><strong>Use Case</strong></td>
+                    <td>Long-term user preferences</td>
+                    <td>Temporary session data</td>
+                </tr>
+                <tr>
+                    <td><strong>Page Refresh</strong></td>
+                    <td>Data survives</td>
+                    <td>Data survives</td>
+                </tr>
+                <tr>
+                    <td><strong>Browser Close</strong></td>
+                    <td>Data persists</td>
+                    <td>Data is cleared</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Tasks from Session Storage -->
+        <div class="demo-section">
+            <h2>✅ Tasks Synced from sessionStorage</h2>
+            <p id="taskCount" style="color: #666;"></p>
+            <ul id="syncedTasks" class="task-list-demo"></ul>
+        </div>
+
+        <!-- Instructions -->
+        <div class="demo-section" style="background: #e7f3ff; border-color: #2196F3;">
+            <h2>🧪 Try This:</h2>
+            <ol style="margin: 10px 0;">
+                <li>Go back to Task Manager and add a few tasks</li>
+                <li>Come back to this page and click "View sessionStorage"</li>
+                <li>You'll see the tasks stored in sessionStorage</li>
+                <li>Open this page in a new tab - sessionStorage will be empty (different session)</li>
+                <li>But localStorage will still have your tasks (persistent)</li>
+                <li>Close the browser completely and reopen - localStorage data remains, sessionStorage is gone</li>
+            </ol>
+        </div>
+
+        <!-- Navigation Back -->
+        <div class="navigation">
+            <a href="index.html" class="nav-link">← Back to Task Manager</a>
+        </div>
+    </div>
+
+    <script>
+        // View Session Storage
+        function viewSessionStorage() {
+            const content = document.getElementById('sessionContent');
+            const data = sessionStorage.getItem('tasks');
+
+            if (data) {
+                try {
+                    const tasks = JSON.parse(data);
+                    content.textContent = JSON.stringify(tasks, null, 2);
+                } catch (e) {
+                    content.textContent = data;
+                }
+            } else {
+                content.textContent = '⚠️ sessionStorage is empty!\n\nGo back to Task Manager and add some tasks.';
+            }
+        }
+
+        // View Local Storage
+        function viewLocalStorage() {
+            const content = document.getElementById('localContent');
+            const data = localStorage.getItem('tasks');
+
+            if (data) {
+                try {
+                    const tasks = JSON.parse(data);
+                    content.textContent = JSON.stringify(tasks, null, 2);
+                } catch (e) {
+                    content.textContent = data;
+                }
+            } else {
+                content.textContent = '⚠️ localStorage is empty!\n\nGo back to Task Manager and add some tasks.';
+            }
+        }
+
+        // Clear Session Storage
+        function clearSessionStorage() {
+            if (confirm('Are you sure you want to clear sessionStorage? (This will only affect this tab)')) {
+                sessionStorage.clear();
+                document.getElementById('sessionContent').textContent = '✓ sessionStorage cleared!';
+            }
+        }
+
+        // Clear Local Storage
+        function clearLocalStorage() {
+            if (confirm('Are you sure you want to clear localStorage? (This will permanently delete all your tasks!)')) {
+                localStorage.clear();
+                document.getElementById('localContent').textContent = '✓ localStorage cleared!';
+            }
+        }
+
+        // Display synced tasks
+        function displaySyncedTasks() {
+            const data = sessionStorage.getItem('tasks');
+            const taskCount = document.getElementById('taskCount');
+            const taskList = document.getElementById('syncedTasks');
+
+            if (data) {
+                try {
+                    const tasks = JSON.parse(data);
+                    taskCount.textContent = `Found ${tasks.length} task(s) in sessionStorage:`;
+
+                    taskList.innerHTML = '';
+                    tasks.forEach(task => {
+                        const li = document.createElement('li');
+                        li.className = task.completed ? 'completed' : '';
+                        li.textContent = `${task.completed ? '✓' : '○'} ${task.text}`;
+                        taskList.appendChild(li);
+                    });
+                } catch (e) {
+                    taskCount.textContent = 'Error parsing tasks from sessionStorage';
+                }
+            } else {
+                taskCount.textContent = 'No tasks found in sessionStorage';
+                taskList.innerHTML = '<li>Add tasks in the Task Manager to see them here</li>';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            displaySyncedTasks();
+        });
+
+        // Listen for storage changes from other tabs (for localStorage)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'tasks') {
+                displaySyncedTasks();
+            }
+        });
+    </script>
+</body>
+</html>
